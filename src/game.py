@@ -2,6 +2,7 @@ from input_handler import InputHandler
 from ai_handler import AIHandler
 from player import Player
 from animals import *
+from toolbox import all_animals_dead
 
 class Game:
     def __init__(self):
@@ -22,13 +23,32 @@ class Game:
         wild_animals = self._randomize_encounter()
         
         # Create queue from highest speed to lowest speed
-        qq = (wild_animals + self.player.party)
+        qq: list[Animal] = (self.player.party + wild_animals)
         qq.sort(key=lambda x: x.spd, reverse=True)
         
         while True:
+            # Decide targets
             self.input_handler.decide_targets(self.player.party, wild_animals)
             self.ai_handler.decide_targets(wild_animals, self.player.party)
-            break
+            
+            # Execute actions
+            for animal in qq:
+                animal.execute_action()
+            
+            # Check for winner/loser
+            if all_animals_dead(self.player.party):
+                self._handle_player_loss()
+                return
+            if all_animals_dead(wild_animals):
+                self._handle_player_win()
+                return
+                
+    def _handle_player_loss(self):
+        print("* All your Animals died")
+        print("* Unprotected, you fell prey to a swarm of angry squirrels") # TODO: Randomize this line
+        
+    def _handle_player_win(self):
+        print("* The wild beasts fled from your animals' ruthless attacks") # TODO: Randomize this line
     
     def start(self):
         print("* Choose your starting companion:")
