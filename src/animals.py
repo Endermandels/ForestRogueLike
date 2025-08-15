@@ -23,7 +23,7 @@ class Animal:
         self.action = {}
     
     def __repr__(self) -> str:
-        return f'{'Wild' if self.is_wild else 'Tamed'} {self.name}: [{self.hp}] [{self.atk}] [{self.spd}]'
+        return f'{'Wild' if self.is_wild else 'Tamed'} {self.name} [{self.hp}]: [{self.atk}] [{self.spd}]'
     
     def set_target(self, target):
         '''
@@ -48,14 +48,22 @@ class Animal:
         # Can't take damage if already dead
         if self.is_dead():
             return
+        
         old_hp = self.hp
         self.hp = clamp(self.hp - amount, 0, self.max_hp)
         print(f'{self} took {old_hp - self.hp} damage')
+
         if self.is_dead():
             print(f'### {self} died!')
     
     def is_dead(self) -> bool:
         return self.hp <= 0
+    
+    def can_attack(self) -> bool:
+        return not self.is_dead()
+    
+    def can_be_attacked(self) -> bool:
+        return not self.is_dead()
     
     def tame(self):
         self.is_wild = False

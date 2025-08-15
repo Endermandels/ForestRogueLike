@@ -2,7 +2,7 @@ from input_handler import InputHandler
 from ai_handler import AIHandler
 from player import Player
 from animals import *
-from toolbox import all_animals_dead
+from toolbox import *
 
 class Game:
     def __init__(self):
@@ -14,7 +14,7 @@ class Game:
         '''
         Return a list of up to 3 animals for the encounter.
         '''
-        return [Hound()] # TODO: Fix this
+        return [Hound(), Cat()] # TODO: Fix this
     
     def _enter_training(self):
         pass
@@ -28,8 +28,8 @@ class Game:
         
         while True:
             # Decide targets
-            self.input_handler.decide_targets(self.player.party, wild_animals)
-            self.ai_handler.decide_targets(wild_animals, self.player.party)
+            self.input_handler.decide_targets(filter_can_attack(self.player.party), filter_can_be_attacked(wild_animals))
+            self.ai_handler.decide_targets(filter_can_attack(wild_animals), filter_can_be_attacked(self.player.party))
             
             # Execute actions
             for animal in qq:
@@ -42,6 +42,9 @@ class Game:
             if all_animals_dead(wild_animals):
                 self._handle_player_win()
                 return
+            
+            # Remove dead animals from the queue
+            remove_dead_animals(qq)
                 
     def _handle_player_loss(self):
         print("* All your Animals died")
@@ -52,7 +55,6 @@ class Game:
     
     def start(self):
         print("* Choose your starting companion:")
-        
         start_options = [Hound(), Cat()]
         self.player.add_animal(start_options[self.input_handler.get_choice(start_options)])
         self._enter_battle()

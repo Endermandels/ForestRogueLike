@@ -5,7 +5,15 @@ class InputHandler:
         pass
     
     def decide_targets(self, my_animals: list[Animal], enemy_animals: list[Animal]):
+        """
+        Prompts the user to select attack targets for each of their animals.
+
+        Parameters:
+            my_animals (list[Animal]): The player's animals.
+            enemy_animals (list[Animal]): The enemy animals.
+        """
         for my_animal in my_animals:
+            print()
             print(f'* Choose which animal your {my_animal} attacks')
             idx = self.get_choice(enemy_animals)
             my_animal.set_target(enemy_animals[idx])
