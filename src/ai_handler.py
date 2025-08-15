@@ -15,7 +15,7 @@ class AIHandler:
         """
         Return a list of up to 3 animals for the encounter.
         """
-        self.party = [Hound(), Hound(), Hound()]  # TODO: Fix this
+        self.party = [Hound(), Squirrel()]  # TODO: Fix this
 
     def decide_targets(self, my_animals: list[Animal], enemy_animals: list[Animal]):
         """
@@ -27,6 +27,9 @@ class AIHandler:
     def remove_dead_animals(self):
         remove_dead_animals(self.party)
 
+    def remove_animal(self, animal: Animal):
+        self.party.remove(animal)
+
     def all_animals_dead(self) -> bool:
         return len(self.party) < 1
 
@@ -35,3 +38,6 @@ class AIHandler:
 
     def animals_that_can_be_attacked(self) -> list[Animal]:
         return filter_can_be_attacked(self.party)
+
+    def get_willing_animals(self) -> list[Animal]:
+        return [animal for animal in self.party if animal.is_willing_to_join_player()]

@@ -3,7 +3,6 @@ from game import Game
 
 def main():
     print("~~~ FOREST ROGUE LIKE ~~~")
-    print()
 
     cur_game = Game()
     cur_game.start()

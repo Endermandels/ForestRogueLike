@@ -1,3 +1,12 @@
+from getpass import getpass
+
+
+def iprint(string: str):
+    """Print string and wait for input to continue"""
+    print(string, end="", flush=True)
+    getpass(" ")  # Hides text
+
+
 def clamp(val, minimum, maximum):
     if val < minimum:
         return minimum

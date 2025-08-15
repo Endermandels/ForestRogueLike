@@ -4,13 +4,15 @@ import sys
 
 
 class Player:
+    PARTY_SIZE = 3
+
     def __init__(self):
         self.party: list[Animal] = []
 
     def add_animal(self, animal: Animal):
         animal.tame()
         self.party.append(animal)
-        print(f"$ {animal} joined your party")
+        iprint(f"$ {animal} joined your party")
 
     def train_animal(self, idx: int):
         if idx < 0 or idx >= len(self.party):
@@ -41,3 +43,6 @@ class Player:
 
     def animals_that_can_be_attacked(self) -> list[Animal]:
         return filter_can_be_attacked(self.party)
+
+    def has_full_party(self) -> bool:
+        return len(self.party) >= Player.PARTY_SIZE
