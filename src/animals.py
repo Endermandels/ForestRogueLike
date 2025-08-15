@@ -11,8 +11,16 @@ from toolbox import clamp
 from enum import Enum
 
 
+# Animal Actions
 class Action(Enum):
     ATTACK = "attack"
+
+
+# Training Buffs
+class Buff(Enum):
+    ATK = "ATK"
+    HP = "HP"
+    NONE = ""
 
 
 class Animal:
@@ -25,14 +33,14 @@ class Animal:
         self.spd = spd
 
         self.action = {}
-        self.training_buff = ""  # 'ATK', 'HP' or ''
+        self.training_buff = Buff.NONE
 
     def __repr__(self) -> str:
         return (
             f"{'Wild' if self.is_wild else 'Tamed'}"
             f" {self.name}"
-            f" ({self.hp}{' + 2' if self.training_buff == 'HP' else ''}):"
-            f" [{self.atk}{' + 1' if self.training_buff == 'ATK' else ''}]"
+            f" ({self.hp}{' + 2' if self.training_buff == Buff.HP else ''}):"
+            f" [{self.atk}{' + 1' if self.training_buff == Buff.ATK else ''}]"
             f" [{self.spd}]"
         )
 
@@ -46,8 +54,9 @@ class Animal:
 
         if Action.ATTACK in self.action:
             enemy: Animal = self.action[Action.ATTACK]
-            print(f"! {self} attacked {enemy}")
-            enemy.take_dmg(self, self.atk)
+            if enemy.can_be_attacked():
+                print(f"! {self} attacked {enemy}")
+                enemy.take_dmg(self, self.atk)
 
         # Reset stored action
         self.action = {}
@@ -77,11 +86,23 @@ class Animal:
         self.is_wild = False
 
     def decide_training_buff(self):
-        is_atk_buff = randint(0, 1)
-        self.training_buff = "ATK" if is_atk_buff else "HP"
+        buff_type = randint(0, 1)
+        if buff_type == 0:
+            self.training_buff = Buff.ATK
+        elif buff_type == 1:
+            self.training_buff = Buff.HP
+
+    def train(self):
+        if self.training_buff == Buff.ATK:
+            self.atk += 1
+        if self.training_buff == Buff.HP:
+            self.max_hp += 2
 
     def clear_training_buff(self):
-        self.training_buff = ""
+        self.training_buff = Buff.NONE
+
+    def reset_stats(self):
+        self.hp = self.max_hp
 
 
 class Hound(Animal):

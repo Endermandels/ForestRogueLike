@@ -8,7 +8,6 @@ def main():
     cur_game = Game()
     cur_game.start()
 
-    print()
     print("~ Come Again Soon ~")
 
 

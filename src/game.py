@@ -16,58 +16,64 @@ class Game:
         self.running = False
         self.n_battles = 5
 
-    def _randomize_encounter(self) -> list[Animal]:
-        """
-        Return a list of up to 3 animals for the encounter.
-        """
-        return [Hound()]  # TODO: Fix this
-
     def _enter_training(self):
         print("* Choose an animal to train")
+        self.player.reset_animal_stats()
+        self.player.decide_training_buffs()
+        self.player.train_animal(self.input_handler.get_choice(self.player.party))
 
     def _enter_battle(self):
         self.n_battles -= 1
-        wild_animals = self._randomize_encounter()
+        self.ai_handler.randomize_party()
+        self.player.reset_animal_stats()
 
         print()
         print("* You encountered:")
-        for animal in wild_animals:
+        for animal in self.ai_handler.party:
             print(f"- A {animal}")
 
         # Create queue from highest speed to lowest speed
-        qq: list[Animal] = self.player.party + wild_animals
+        qq: list[Animal] = self.player.party + self.ai_handler.party
         qq.sort(key=lambda x: x.spd, reverse=True)
 
         while True:
             # Decide targets
             self.input_handler.decide_targets(
-                filter_can_attack(self.player.party), filter_can_be_attacked(wild_animals)
+                self.player.animals_that_can_attack(), self.ai_handler.animals_that_can_be_attacked()
             )
-            self.ai_handler.decide_targets(filter_can_attack(wild_animals), filter_can_be_attacked(self.player.party))
+            self.ai_handler.decide_targets(
+                self.ai_handler.animals_that_can_attack(), self.player.animals_that_can_be_attacked()
+            )
 
             # Execute actions
             for animal in qq:
-                animal.execute_action()
+                if not animal.is_dead():
+                    animal.execute_action()
+                    input()  # TODO: Make it so that only when text appears this input is activated
 
             # Remove dead animals from the game
-            remove_dead_animals(self.player.party)
-            remove_dead_animals(wild_animals)
+            self.player.remove_dead_animals()
+            self.ai_handler.remove_dead_animals()
 
             # Check for win/loss
-            if len(self.player.party) < 1:
+            if self.player.all_animals_dead():
                 self._handle_player_loss()
                 return
-            if len(wild_animals) < 1:
+            if self.ai_handler.all_animals_dead():
                 self._handle_player_win()
                 return
 
     def _handle_player_loss(self):
+        print()
         print("* All your Animals died")
         print("* Unprotected, you fell prey to a swarm of angry squirrels")  # TODO: Randomize this line
+        print()
         self.running = False
 
     def _handle_player_win(self):
+        print()
         print("* The wild beasts fled from your animals' ruthless attacks")  # TODO: Randomize this
+        print()
 
     def start(self):
         self.running = True
