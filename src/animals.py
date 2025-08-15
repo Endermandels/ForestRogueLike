@@ -23,7 +23,7 @@ class Animal:
         self.action = {}
     
     def __repr__(self) -> str:
-        return f'{'Wild' if self.is_wild else 'Tamed'} {self.name} [{self.hp}]: [{self.atk}] [{self.spd}]'
+        return f'{'Wild' if self.is_wild else 'Tamed'} {self.name} ({self.hp}): [{self.atk}] [{self.spd}]'
     
     def set_target(self, target):
         '''

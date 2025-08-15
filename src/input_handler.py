@@ -1,4 +1,5 @@
 from animals import Animal
+import sys
 
 class InputHandler:
     def __init__(self):
@@ -30,13 +31,23 @@ class InputHandler:
             
         while idx < 0:
             inp = input(input_str + ">> ").strip()
+
+            # Check for quit
+            if inp == 'q':
+                sys.exit()
+            
+            # Check is number
             if not inp.isnumeric():
                 print("! Please input one of the option numbers")
                 continue
             inp = int(inp)
+
+            # Check number within the range of options
             if inp < 1 or inp > len(options):
                 print("! Please input one of the option numbers")
                 continue
+
+            # Convert number to index
             idx = inp - 1
             
         return idx
