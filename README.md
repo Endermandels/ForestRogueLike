@@ -18,6 +18,11 @@ Enemy choices are all random
 
 Choose to start with dog or cat
 
+## Input Commands:
+
+`q`: quit
+`v`: view party
+
 ## Notes:
 ```
 * General text
