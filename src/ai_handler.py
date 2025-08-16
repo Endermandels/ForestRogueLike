@@ -12,10 +12,20 @@ class AIHandler:
         self.party: list[Animal] = []
 
     def randomize_party(self):
-        """
-        Return a list of up to 3 animals for the encounter.
-        """
-        self.party = [Hound(), Squirrel()]  # TODO: Fix this
+        ENCOUNTERS = [
+            [Squirrel(), Squirrel(), Squirrel()],
+            [Squirrel(), Squirrel()],
+            [Squirrel(), Squirrel()],
+            [Squirrel()],
+            [Hound(), Squirrel()],
+            [Hound()],
+            [Hound()],
+            [Cat()],
+        ]
+        self.party = choice(ENCOUNTERS)
+
+    def boss_party(self):
+        self.party = [Grizzly(), Hound()]  # TODO: Fix this
 
     def decide_targets(self, my_animals: list[Animal], enemy_animals: list[Animal]):
         """

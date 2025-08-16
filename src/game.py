@@ -8,9 +8,9 @@ from toolbox import *
 class Game:
     def __init__(self):
         # Objects
-        self.input_handler = InputHandler()
         self.ai_handler = AIHandler()
         self.player = Player()
+        self.input_handler = InputHandler(self.player)
 
         # Settings
         self.running = False
@@ -23,12 +23,17 @@ class Game:
         self.player.decide_training_buffs()
         self.player.train_animal(self.input_handler.get_choice(self.player.party))
 
-    def _enter_battle(self):
+    def _enter_battle(self, boss=False):
         self.n_battles -= 1
-        self.ai_handler.randomize_party()
+
+        if boss:
+            self.ai_handler.boss_party()
+        else:
+            self.ai_handler.randomize_party()
         self.player.reset_animal_stats()
 
         print()
+        print(f"~ {self.n_battles if not boss else "BOSS"} ~")
         iprint("* You encountered:")
         for animal in self.ai_handler.party:
             iprint(f"- A {animal}")
@@ -47,7 +52,7 @@ class Game:
                     iprint("* But your party was full")
                 else:
                     print()
-                    iprint("* Choose which animal to join you")
+                    iprint("* Choose which animal joins you")
                     added = self.input_handler.decide_add_willing(willing_animals)
                     if added:
                         self.ai_handler.remove_animal(added)
@@ -68,8 +73,7 @@ class Game:
 
             # Execute actions
             for animal in qq:
-                if not animal.is_dead():
-                    animal.execute_action()
+                animal.execute_action()
 
             # Remove dead animals from the game
             self.player.remove_dead_animals()
@@ -102,7 +106,12 @@ class Game:
         start_options = [Hound(), Cat()]
         self.player.add_animal(start_options[self.input_handler.get_choice(start_options)])
 
-        while self.running:
+        # General battles
+        while self.player.is_alive() and self.n_battles > 0:
             self._enter_battle()
-            if self.running:
+            if self.player.is_alive():
                 self._enter_training()
+
+        # Boss battle
+        if self.player.is_alive():
+            self._enter_battle(boss=True)

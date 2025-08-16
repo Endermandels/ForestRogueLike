@@ -1,12 +1,13 @@
 from animals import Animal
 from toolbox import iprint
+from player import Player
 from random import choice
 import sys
 
 
 class InputHandler:
-    def __init__(self):
-        pass
+    def __init__(self, player: Player):
+        self.player = player
 
     def decide_add_willing(self, willing_animals: list[Animal]) -> Animal | None:
         """
@@ -59,14 +60,19 @@ class InputHandler:
             if inp == "q":
                 sys.exit()
 
+            # View party option
+            if inp == "v":
+                self.player.print_party()
+                continue
+
             # Check is number
             if not inp.isnumeric():
                 print("! Please input one of the option numbers")
                 continue
             inp = int(inp)
 
-            # Check number within the range of options
-            if inp < 1 or inp > len(options):
+            # Check number within the range of options and viewing the player's party
+            if inp < 1 or inp > len(options) + 1:
                 print("! Please input one of the option numbers")
                 continue
 

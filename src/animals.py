@@ -97,12 +97,12 @@ class Animal:
     def train(self):
         if self.training_buff == Buff.ATK:
             self.training_buff = Buff.NONE
-            iprint(f"$ Your {self} increased its ATK")
             self.atk += 1
+            iprint(f"$ Your {self} increased its {Fore.YELLOW}ATK{Style.RESET_ALL}")
         if self.training_buff == Buff.HP:
             self.training_buff = Buff.NONE
-            iprint(f"$ Your {self} increased its HP")
             self.max_hp += 2
+            iprint(f"$ Your {self} increased its {Fore.YELLOW}HP{Style.RESET_ALL}")
 
     def clear_training_buff(self):
         self.training_buff = Buff.NONE
@@ -121,6 +121,11 @@ class Animal:
         if self.friendliness == 4:
             return not randint(0, int(10 * percent_health) + 1)
         return not randint(0, 1)
+
+
+class Grizzly(Animal):
+    def __init__(self, hp: int = 6, atk: int = 4, spd: int = 1, friendliness: int = 1, is_wild: bool = True):
+        Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Grizzly")
 
 
 class Hound(Animal):

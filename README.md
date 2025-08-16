@@ -24,4 +24,5 @@ Choose to start with dog or cat
 ! Combat text
 1. Option list text
 - Unordered list text
+~ Special text ~
 ```

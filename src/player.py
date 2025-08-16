@@ -9,6 +9,10 @@ class Player:
     def __init__(self):
         self.party: list[Animal] = []
 
+    def print_party(self):
+        for animal in self.party:
+            print(f"- {animal}")
+
     def add_animal(self, animal: Animal):
         animal.tame()
         self.party.append(animal)
@@ -46,3 +50,6 @@ class Player:
 
     def has_full_party(self) -> bool:
         return len(self.party) >= Player.PARTY_SIZE
+
+    def is_alive(self) -> bool:
+        return not self.all_animals_dead()
