@@ -25,7 +25,7 @@ class AIHandler:
         self.party = choice(ENCOUNTERS)
 
     def boss_party(self):
-        self.party = [Grizzly(), Hound()]  # TODO: Fix this
+        self.party = [Grizzly(friendliness=0), Hound(friendliness=0)]  # TODO: Fix this
 
     def decide_targets(self, my_animals: list[Animal], enemy_animals: list[Animal]):
         """

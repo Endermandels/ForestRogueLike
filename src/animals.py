@@ -112,6 +112,8 @@ class Animal:
 
     def is_willing_to_join_player(self) -> bool:
         percent_health = 1 - ((self.max_hp - self.hp) / self.max_hp)
+        if self.friendliness == 0:
+            return False
         if self.friendliness == 1:
             return not randint(0, int(50 * percent_health) + 30)
         if self.friendliness == 2:
