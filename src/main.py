@@ -1,13 +1,14 @@
 from game import Game
+from toolbox import scroll
 
 
 def main():
-    print("~~~ FOREST ROGUE LIKE ~~~")
+    scroll("~~~ FOREST ROGUE LIKE ~~~")
 
     cur_game = Game()
     cur_game.start()
 
-    print("~ Come Again Soon ~")
+    scroll("~ Come Again Soon ~")
 
 
 if __name__ == "__main__":

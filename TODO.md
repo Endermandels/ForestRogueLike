@@ -1,1 +1,1 @@
-* 
+- Scroll text, Enter to skip

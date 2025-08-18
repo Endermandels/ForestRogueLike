@@ -1,10 +1,13 @@
-from getpass import getpass
+from time import sleep
+
+SCROLL_SPEED = 0.025
 
 
-def iprint(string: str):
-    """Print string and wait for input to continue"""
-    print(string, end="", flush=True)
-    getpass(" ")  # Hides text
+def scroll(string: str = "", end: str = "\n"):
+    for c in string:
+        print(c, end="", flush=True)
+        sleep(SCROLL_SPEED)
+    print("", end=end)
 
 
 def clamp(val, minimum, maximum):

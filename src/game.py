@@ -17,8 +17,8 @@ class Game:
         self.n_battles = 5
 
     def _enter_training(self):
-        print()
-        iprint("* Choose an animal to train")
+        scroll()
+        scroll("* Choose an animal to train")
         self.player.reset_animal_stats()
         self.player.decide_training_buffs()
         self.player.train_animal(self.input_handler.get_choice(self.player.party))
@@ -32,11 +32,11 @@ class Game:
             self.ai_handler.randomize_party()
         self.player.reset_animal_stats()
 
-        print()
-        print(f"~ {self.n_battles if not boss else "BOSS"} ~")
-        iprint("* You encountered:")
+        scroll()
+        scroll(f"~ {self.n_battles if not boss else "BOSS"} ~")
+        scroll("* You encountered:")
         for animal in self.ai_handler.party:
-            iprint(f"- A {animal}")
+            scroll(f"- A {animal}")
 
         # Create queue from highest speed to lowest speed
         qq: list[Animal] = self.player.party + self.ai_handler.party
@@ -46,20 +46,23 @@ class Game:
             # Decide wild animals willing to joing player if player has room
             willing_animals = self.ai_handler.get_willing_animals()
             if len(willing_animals) > 0:
-                print()
-                iprint("* Some of the wild beasts seemed willing to join your party")
+                scroll()
+                scroll("* Some of the wild beasts seemed willing to join your party")
                 if self.player.has_full_party():
-                    iprint("* But your party was full")
+                    scroll("* But your party was full")
                 else:
-                    print()
-                    iprint("* Choose which animal joins you")
+                    scroll()
+                    scroll("* Choose which animal joins you")
                     added = self.input_handler.decide_add_willing(willing_animals)
                     if added:
                         self.ai_handler.remove_animal(added)
                         self.player.add_animal(added)
                         if self.ai_handler.all_animals_dead():
-                            print()
-                            iprint("* Fearing your wrath and comforted by your demeanor, the wild animals followed you")
+                            scroll()
+                            scroll(
+                                "* Fearing your wrath and comforted by your demeanor, "
+                                "the wild animals followed you"
+                            )
                             return
 
             # Decide targets
@@ -75,6 +78,10 @@ class Game:
             for animal in qq:
                 animal.execute_action()
 
+            # Apply effects
+            for animal in qq:
+                animal.apply_after_effects()
+
             # Remove dead animals from the game
             self.player.remove_dead_animals()
             self.ai_handler.remove_dead_animals()
@@ -89,20 +96,22 @@ class Game:
                 return
 
     def _handle_player_loss(self):
-        print()
-        iprint("* All your Animals died")
-        iprint("* Unprotected, you fell prey to a swarm of angry squirrels")  # TODO: Randomize this line
+        scroll()
+        scroll("* All your Animals died")
+        scroll(
+            "* Unprotected, you fell prey to a swarm of angry squirrels"
+        )  # TODO: Randomize this line
         self.running = False
 
     def _handle_player_win(self):
-        print()
-        iprint("* The wild beasts fled from your animals' ruthless attacks")  # TODO: Randomize this
+        scroll()
+        scroll("* The wild beasts fled from your animals' ruthless attacks")  # TODO: Randomize this
 
     def start(self):
         self.running = True
 
-        print()
-        iprint("* Choose your starting companion")
+        scroll()
+        scroll("* Choose your starting companion")
         start_options = [Hound(), Cat()]
         self.player.add_animal(start_options[self.input_handler.get_choice(start_options)])
 

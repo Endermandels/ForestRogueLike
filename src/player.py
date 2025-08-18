@@ -11,16 +11,16 @@ class Player:
 
     def print_party(self):
         for animal in self.party:
-            print(f"- {animal}")
+            scroll(f"- {animal}")
 
     def add_animal(self, animal: Animal):
         animal.tame()
         self.party.append(animal)
-        iprint(f"$ {animal} joined your party")
+        scroll(f"$ {animal} joined your party")
 
     def train_animal(self, idx: int):
         if idx < 0 or idx >= len(self.party):
-            print(f"### Incorrect idx: {idx} ###")
+            scroll(f"### Incorrect idx: {idx} ###")
             sys.exit()
 
         self.party[idx].train()

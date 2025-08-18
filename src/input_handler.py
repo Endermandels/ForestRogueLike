@@ -1,5 +1,5 @@
 from animals import Animal
-from toolbox import iprint
+from toolbox import scroll
 from player import Player
 from random import choice
 import sys
@@ -20,7 +20,7 @@ class InputHandler:
 
         # "I don't want these ones" option
         if idx == len(willing_animals):
-            iprint(f"* {choice(willing_animals)} felt rejected")  # TODO: Randomize this line
+            scroll(f"* {choice(willing_animals)} felt rejected")  # TODO: Randomize this line
             return None
 
         return willing_animals[idx]
@@ -34,8 +34,8 @@ class InputHandler:
             enemy_animals (list[Animal]): The enemy Animals.
         """
         for my_animal in my_animals:
-            print()
-            iprint(f"* Choose which animal your {my_animal} attacks")
+            scroll()
+            scroll(f"* Choose which animal your {my_animal} targets")
 
             # Allow Animals not to attack
             idx = self.get_choice(enemy_animals + ["Don't attack"])
@@ -51,7 +51,7 @@ class InputHandler:
 
         for i, option in enumerate(options):
             input_str += f"{i+1}. {option}\n"
-        print(input_str, end="")
+        scroll(input_str, end="")
 
         while idx < 0:
             inp = input(">> ").strip()
