@@ -112,7 +112,7 @@ class Game:
 
         scroll()
         scroll("* Choose your starting companion")
-        start_options = [Snake(hp=100, xp_thresh=5), Cat()]
+        start_options = [Snake(hp=100, xp_thresh=5)]
         self.player.add_animal(start_options[self.input_handler.get_choice(start_options)])
 
         # General battles
