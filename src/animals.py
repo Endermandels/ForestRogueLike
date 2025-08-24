@@ -5,11 +5,6 @@ from enum import Enum
 from colorama import Fore, Style
 
 
-# Animal Actions
-class Action(Enum):
-    ATTACK = "attack"
-
-
 # Training Buffs
 class Buff(Enum):
     ATK = "ATK"
