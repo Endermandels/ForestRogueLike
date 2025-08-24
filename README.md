@@ -4,9 +4,9 @@
 
 10 unique animals
 
-15 battles
+5 battles
 
-3 bosses (higher stats)
+1 boss (higher stats)
 
 Special abilities (poison, stench, spikes, etc.)
 
@@ -20,8 +20,8 @@ Encounter forrest dwellers to expound on lore and give player bonuses:
 - A Dryad (increase friendliness in random animals)
 - A Treant (increase party stats)
 
-Choose which animal attacks which opposing animal
-Attacks are the effects applied to the opposing animal (not always/only damage)
+Choose which animal targets which other animal for their action
+Actions are the effects applied to the target animal (not always/only damage)
 
 Enemy choices are all random
 

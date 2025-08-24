@@ -33,7 +33,7 @@ class Game:
         self.player.reset_animal_stats()
 
         scroll()
-        scroll(f"~ {self.n_battles if not boss else "BOSS"} ~")
+        scroll(f"~ {self.n_battles + 1 if not boss else "BOSS"} ~")
         scroll("* You encountered:")
         for animal in self.ai_handler.party:
             scroll(f"- A {animal}")

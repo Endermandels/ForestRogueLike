@@ -1,1 +1,5 @@
 - Scroll text, Enter to skip
+- __repr__ changes due to circumstances and buffs (like first turn advantage for cat)
+- Decide whether to allow wild animals to transform to their alpha forms?  Perhaps randomize their base XP?
+- Need to see that the action was successful before gaining XP.
+- Randomize dialog

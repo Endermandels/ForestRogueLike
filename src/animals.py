@@ -179,13 +179,34 @@ class Animal:
 
 class Grizzly(Animal):
     def __init__(
-        self, hp: int = 6, atk: int = 4, spd: int = 1, friendliness: int = 1, is_wild: bool = True
+        self,
+        hp: int = 6,
+        atk: int = 4,
+        spd: int = 1,
+        friendliness: int = 1,
+        xp_thresh: int = 100,
+        xp_per_action: int = 5,
+        xp_per_train_hp: int = 10,
+        xp_per_train_atk: int = 20,
+        is_wild: bool = True,
     ):
-        Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Grizzly")
+        Animal.__init__(
+            self,
+            hp,
+            atk,
+            spd,
+            friendliness,
+            xp_thresh,
+            xp_per_action,
+            xp_per_train_hp,
+            xp_per_train_atk,
+            is_wild=is_wild,
+            name="Grizzly",
+        )
         self.action = self._action
 
     def _action(self, target: Animal):
-        if target.can_be_attacked():
+        if target and target.can_be_attacked():
             scroll(f"! {self} attacked {target}")
             target.take_dmg(self, self.atk)
 
@@ -196,13 +217,34 @@ class Grizzly(Animal):
 
 class Hound(Animal):
     def __init__(
-        self, hp: int = 2, atk: int = 2, spd: int = 2, friendliness: int = 4, is_wild: bool = True
+        self,
+        hp: int = 2,
+        atk: int = 2,
+        spd: int = 2,
+        friendliness: int = 4,
+        xp_thresh: int = 100,
+        xp_per_action: int = 5,
+        xp_per_train_hp: int = 10,
+        xp_per_train_atk: int = 20,
+        is_wild: bool = True,
     ):
-        Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Hound")
+        Animal.__init__(
+            self,
+            hp,
+            atk,
+            spd,
+            friendliness,
+            xp_thresh,
+            xp_per_action,
+            xp_per_train_hp,
+            xp_per_train_atk,
+            is_wild=is_wild,
+            name="Hound",
+        )
         self.action = self._action
 
     def _action(self, target: Animal):
-        if target.can_be_attacked():
+        if target and target.can_be_attacked():
             scroll(f"! {self} attacked {target}")
             target.take_dmg(self, self.atk)
 
@@ -218,7 +260,7 @@ class Cat(Animal):
         atk: int = 1,
         spd: int = 3,
         friendliness: int = 3,
-        xp_thresh: int = 100,
+        xp_thresh: int = 10,
         xp_per_action: int = 5,
         xp_per_train_hp: int = 10,
         xp_per_train_atk: int = 20,
@@ -242,7 +284,7 @@ class Cat(Animal):
         self.first_attack_bonus: int = 1
 
     def _action(self, target: Animal):
-        if target.can_be_attacked():
+        if target and target.can_be_attacked():
             scroll(f"! {self} attacked {target}")
             if self.first_attack:
                 target.take_dmg(self, self.atk + self.first_attack_bonus)
@@ -269,13 +311,34 @@ class Cat(Animal):
 
 class Squirrel(Animal):
     def __init__(
-        self, hp: int = 1, atk: int = 1, spd: int = 2, friendliness: int = 5, is_wild: bool = True
+        self,
+        hp: int = 1,
+        atk: int = 1,
+        spd: int = 2,
+        friendliness: int = 5,
+        xp_thresh: int = 100,
+        xp_per_action: int = 5,
+        xp_per_train_hp: int = 10,
+        xp_per_train_atk: int = 20,
+        is_wild: bool = True,
     ):
-        Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Squirrel")
+        Animal.__init__(
+            self,
+            hp,
+            atk,
+            spd,
+            friendliness,
+            xp_thresh,
+            xp_per_action,
+            xp_per_train_hp,
+            xp_per_train_atk,
+            is_wild=is_wild,
+            name="Squirrel",
+        )
         self.action = self._action
 
     def _action(self, target: Animal):
-        if target.can_be_attacked():
+        if target and target.can_be_attacked():
             scroll(f"! {self} attacked {target}")
             target.take_dmg(self, self.atk)
 
@@ -286,13 +349,34 @@ class Squirrel(Animal):
 
 class Snake(Animal):
     def __init__(
-        self, hp: int = 1, atk: int = 1, spd: int = 2, friendliness: int = 3, is_wild: bool = True
+        self,
+        hp: int = 1,
+        atk: int = 1,
+        spd: int = 2,
+        friendliness: int = 3,
+        xp_thresh: int = 100,
+        xp_per_action: int = 5,
+        xp_per_train_hp: int = 10,
+        xp_per_train_atk: int = 20,
+        is_wild: bool = True,
     ):
-        Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Snake")
+        Animal.__init__(
+            self,
+            hp,
+            atk,
+            spd,
+            friendliness,
+            xp_thresh,
+            xp_per_action,
+            xp_per_train_hp,
+            xp_per_train_atk,
+            is_wild=is_wild,
+            name="Snake",
+        )
         self.action = self._action
 
     def _action(self, target: Animal):
-        if target.can_be_attacked():
+        if target and target.can_be_attacked():
             scroll(f"! {self} attacked and poisoned {target}")
             target.take_dmg(self, self.atk, poison=True)
 
