@@ -13,14 +13,16 @@ class AIHandler:
 
     def randomize_party(self):
         ENCOUNTERS = [
-            [Squirrel(), Squirrel(), Squirrel()],
-            [Squirrel(), Squirrel()],
-            [Squirrel(), Squirrel()],
-            [Squirrel()],
-            [Hound(), Squirrel()],
-            [Hound()],
-            [Hound()],
-            [Cat()],
+            # [Squirrel(), Squirrel(), Squirrel()],
+            # [Squirrel(), Squirrel()],
+            # [Squirrel()],
+            # [Hound(), Squirrel()],
+            # [Hound()],
+            # [Hound()],
+            # [Snake()],
+            # [Snake()],
+            # [Cat()],
+            [Grizzly(hp=100)],
         ]
         self.party = choice(ENCOUNTERS)
 

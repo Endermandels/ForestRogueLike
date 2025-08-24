@@ -33,6 +33,11 @@ class Animal:
             ATK (attack): 1-4
             SPD (speed): 1-3
             FRE (friendliness): 1-5
+
+        Effects breakdown:
+            Poison - Deal X damage per turn
+            Paralysis - Wait X turns until immobilized, meaning that this Animal cannot perform any actions.  X is never less than 1
+            Invulnerable - This Animal cannot take any damage this turn
         """
         # ID
         self.name: str = name
@@ -59,7 +64,8 @@ class Animal:
 
         # Effects
         self.invulnerable: bool = False
-        self.poisoned: bool = False
+        self.poisoned: int = -1  # Damage per turn (-1 for no poison)
+        self.paralyzed: int = -1  # Number of turns before paralysis (-1 for no paralysis)
 
     def __repr__(self) -> str:
         return (
@@ -82,13 +88,18 @@ class Animal:
         if self.is_dead():
             return
 
-        if self.poisoned:
+        if self.poisoned > 0:
             scroll(f"! {self} suffered from poison")
-            self.take_dmg(None, 1)
+            self.take_dmg(None, self.poisoned)
+
+        if self.paralyzed > 0:
+            self.paralyzed -= 1
+            if self.paralyzed == 0:
+                scroll(f"! {self} fell to the ground paralyzed")
 
     def execute_action(self):
         # Can't execute action if already dead
-        if self.is_dead():
+        if self.can_attack():
             return
 
         self.action(self.action_target)
@@ -97,7 +108,7 @@ class Animal:
         # Reset stored action target
         self.action_target = None
 
-    def take_dmg(self, enemy: Animal, amount: int, poison: bool = False):
+    def take_dmg(self, enemy: Animal, amount: int):
         # Can't take damage if already dead
         if self.is_dead():
             return
@@ -106,17 +117,23 @@ class Animal:
         self.hp = clamp(self.hp - amount, 0, self.max_hp)
         scroll(f"! {self} took {Fore.YELLOW}{old_hp - self.hp}{Style.RESET_ALL} damage")
 
-        if poison:
-            self.poisoned = True
-
         if self.is_dead():
             scroll(f"! {self} {Fore.RED}died{Style.RESET_ALL}")
+
+    def paralyze(self, nturns: int):
+        """nturns should be no less than 1"""
+        if self.paralyzed < 0 and nturns > 0:
+            self.paralyzed = nturns
+
+    def poison(self, amount: int):
+        if amount > self.poisoned:
+            self.poisoned = amount
 
     def is_dead(self) -> bool:
         return self.hp <= 0
 
     def can_attack(self) -> bool:
-        return not self.is_dead()
+        return not self.is_dead() and self.paralyzed != 0
 
     def can_be_attacked(self) -> bool:
         return not self.is_dead() and not self.invulnerable
@@ -138,14 +155,13 @@ class Animal:
             scroll(f"$ Your {self} increased its {Fore.YELLOW}ATK{Style.RESET_ALL}")
         if self.training_buff == Buff.HP:
             self.training_buff = Buff.NONE
-            self.max_hp += 2
-            self.hp = self.max_hp
+            self._increase_base_hp(2)
             scroll(f"$ Your {self} increased its {Fore.YELLOW}HP{Style.RESET_ALL}")
 
     def clear_training_buff(self):
         self.training_buff = Buff.NONE
 
-    def gain_xp(self, xp):
+    def gain_xp(self, xp: int):
         # Can't gain XP if already maxxed out
         if self.xp >= self.xp_thresh:
             return
@@ -161,6 +177,8 @@ class Animal:
 
     def reset_stats(self):
         self.hp = self.max_hp
+        self.poisoned = -1
+        self.paralyzed = -1
 
     def is_willing_to_join_player(self) -> bool:
         percent_health = 1 - ((self.max_hp - self.hp) / self.max_hp)
@@ -176,6 +194,10 @@ class Animal:
             return not randint(0, int(10 * percent_health) + 1)
         return not randint(0, 1)
 
+    def _increase_base_hp(self, amount: int):
+        self.max_hp += amount
+        self.hp += amount
+
 
 class Grizzly(Animal):
     def __init__(
@@ -184,7 +206,7 @@ class Grizzly(Animal):
         atk: int = 4,
         spd: int = 1,
         friendliness: int = 1,
-        xp_thresh: int = 100,
+        xp_thresh: int = 20,
         xp_per_action: int = 5,
         xp_per_train_hp: int = 10,
         xp_per_train_atk: int = 20,
@@ -222,7 +244,7 @@ class Hound(Animal):
         atk: int = 2,
         spd: int = 2,
         friendliness: int = 4,
-        xp_thresh: int = 100,
+        xp_thresh: int = 20,
         xp_per_action: int = 5,
         xp_per_train_hp: int = 10,
         xp_per_train_atk: int = 20,
@@ -260,7 +282,7 @@ class Cat(Animal):
         atk: int = 1,
         spd: int = 3,
         friendliness: int = 3,
-        xp_thresh: int = 10,
+        xp_thresh: int = 20,
         xp_per_action: int = 5,
         xp_per_train_hp: int = 10,
         xp_per_train_atk: int = 20,
@@ -302,11 +324,10 @@ class Cat(Animal):
 
     def _become_alpha(self):
         self.first_attack_bonus = 3
-        self.max_hp += 2
-        self.hp += 2
+        self._increase_base_hp(3)
         self.atk += 1
         self.action = self._alpha_action
-        print(f"$ {self} became an Alpha {self}")
+        scroll(f"$ {self} became an Alpha {self}")
 
 
 class Squirrel(Animal):
@@ -316,7 +337,7 @@ class Squirrel(Animal):
         atk: int = 1,
         spd: int = 2,
         friendliness: int = 5,
-        xp_thresh: int = 100,
+        xp_thresh: int = 20,
         xp_per_action: int = 5,
         xp_per_train_hp: int = 10,
         xp_per_train_atk: int = 20,
@@ -354,7 +375,7 @@ class Snake(Animal):
         atk: int = 1,
         spd: int = 2,
         friendliness: int = 3,
-        xp_thresh: int = 100,
+        xp_thresh: int = 20,
         xp_per_action: int = 5,
         xp_per_train_hp: int = 10,
         xp_per_train_atk: int = 20,
@@ -378,8 +399,18 @@ class Snake(Animal):
     def _action(self, target: Animal):
         if target and target.can_be_attacked():
             scroll(f"! {self} attacked and poisoned {target}")
-            target.take_dmg(self, self.atk, poison=True)
+            target.take_dmg(self, self.atk)
+            target.poison(1)
+
+    def _alpha_action(self, target: Animal):
+        if target and target.can_be_attacked():
+            scroll(f"! {self} attacked and poisoned {target}")
+            target.take_dmg(self, self.atk)
+            target.poison(2)
+            target.paralyze(3)
 
     def _become_alpha(self):
-        # TODO: Implement
-        pass
+        self._increase_base_hp(1)
+        self.atk += 1
+        self.action = self._alpha_action
+        scroll(f"$ {self} became an Alpha {self}")
