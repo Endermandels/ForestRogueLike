@@ -1,8 +1,9 @@
 from __future__ import annotations
-from random import randint
+from typing import Optional, Callable
 from toolbox import clamp, scroll
-from enum import Enum
 from colorama import Fore, Style
+from random import randint
+from enum import Enum
 
 
 # Training Buffs
@@ -19,6 +20,10 @@ class Animal:
         atk: int,
         spd: int,
         friendliness: int,
+        xp_thresh: int,
+        xp_per_action: int,
+        xp_per_train_hp: int,
+        xp_per_train_atk: int,
         is_wild: bool = True,
         name: str = "Animal",
     ):
@@ -29,18 +34,31 @@ class Animal:
             SPD (speed): 1-3
             FRE (friendliness): 1-5
         """
-        self.name = name
-        self.is_wild = is_wild
-        self.max_hp = hp
-        self.hp = self.max_hp
-        self.atk = atk
-        self.spd = spd
-        self.friendliness = friendliness
+        # ID
+        self.name: str = name
+        self.is_wild: bool = is_wild
 
+        # Stats
+        self.max_hp: int = hp
+        self.hp: int = self.max_hp
+        self.atk: int = atk
+        self.spd: int = spd
+
+        # Hidden stats
+        self.friendliness: int = friendliness
+        self.xp: int = 0
+        self.xp_thresh: int = xp_thresh
+        self.xp_per_action: int = xp_per_action
+        self.xp_per_train_hp: int = xp_per_train_hp
+        self.xp_per_train_atk: int = xp_per_train_atk
+
+        # Intentions
+        self.action: Optional[Callable[[Animal], None]] = None
         self.action_target: Animal = None
-        self.training_buff = Buff.NONE
+        self.training_buff: Buff = Buff.NONE
 
         # Effects
+        self.invulnerable: bool = False
         self.poisoned: bool = False
 
     def __repr__(self) -> str:
@@ -69,13 +87,12 @@ class Animal:
             self.take_dmg(None, 1)
 
     def execute_action(self):
-        # Can't execute action if already dead or no target
-        if self.is_dead() or not self.action_target:
+        # Can't execute action if already dead
+        if self.is_dead():
             return
 
-        if self.action_target.can_be_attacked():
-            scroll(f"! {self} attacked {self.action_target}")
-            self.action_target.take_dmg(self, self.atk)
+        self.action(self.action_target)
+        self.gain_xp(self.xp_per_action)
 
         # Reset stored action target
         self.action_target = None
@@ -102,7 +119,7 @@ class Animal:
         return not self.is_dead()
 
     def can_be_attacked(self) -> bool:
-        return not self.is_dead()
+        return not self.is_dead() and not self.invulnerable
 
     def tame(self):
         self.is_wild = False
@@ -128,6 +145,20 @@ class Animal:
     def clear_training_buff(self):
         self.training_buff = Buff.NONE
 
+    def gain_xp(self, xp):
+        # Can't gain XP if already maxxed out
+        if self.xp >= self.xp_thresh:
+            return
+
+        scroll(f"* {self} gained {Fore.YELLOW}{xp}{Style.RESET_ALL} XP")
+        self.xp += xp
+        if self.xp >= self.xp_thresh:
+            self._become_alpha()
+
+    def _become_alpha(self):
+        # TODO: Implement
+        pass
+
     def reset_stats(self):
         self.hp = self.max_hp
 
@@ -151,6 +182,16 @@ class Grizzly(Animal):
         self, hp: int = 6, atk: int = 4, spd: int = 1, friendliness: int = 1, is_wild: bool = True
     ):
         Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Grizzly")
+        self.action = self._action
+
+    def _action(self, target: Animal):
+        if target.can_be_attacked():
+            scroll(f"! {self} attacked {target}")
+            target.take_dmg(self, self.atk)
+
+    def _become_alpha(self):
+        # TODO: Implement
+        pass
 
 
 class Hound(Animal):
@@ -158,13 +199,72 @@ class Hound(Animal):
         self, hp: int = 2, atk: int = 2, spd: int = 2, friendliness: int = 4, is_wild: bool = True
     ):
         Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Hound")
+        self.action = self._action
+
+    def _action(self, target: Animal):
+        if target.can_be_attacked():
+            scroll(f"! {self} attacked {target}")
+            target.take_dmg(self, self.atk)
+
+    def _become_alpha(self):
+        # TODO: Implement
+        pass
 
 
 class Cat(Animal):
     def __init__(
-        self, hp: int = 3, atk: int = 1, spd: int = 3, friendliness: int = 3, is_wild: bool = True
+        self,
+        hp: int = 2,
+        atk: int = 1,
+        spd: int = 3,
+        friendliness: int = 3,
+        xp_thresh: int = 100,
+        xp_per_action: int = 5,
+        xp_per_train_hp: int = 10,
+        xp_per_train_atk: int = 20,
+        is_wild: bool = True,
     ):
-        Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Cat")
+        Animal.__init__(
+            self,
+            hp,
+            atk,
+            spd,
+            friendliness,
+            xp_thresh,
+            xp_per_action,
+            xp_per_train_hp,
+            xp_per_train_atk,
+            is_wild=is_wild,
+            name="Cat",
+        )
+        self.action = self._action
+        self.first_attack: bool = True
+        self.first_attack_bonus: int = 1
+
+    def _action(self, target: Animal):
+        if target.can_be_attacked():
+            scroll(f"! {self} attacked {target}")
+            if self.first_attack:
+                target.take_dmg(self, self.atk + self.first_attack_bonus)
+            else:
+                target.take_dmg(self, self.atk)
+            self.first_attack = False
+
+    def _alpha_action(self, target: Animal):
+        self.invulnerable = self.first_attack
+        self._action(target)
+
+    def reset_stats(self):
+        super().reset_stats()
+        self.first_attack = True
+
+    def _become_alpha(self):
+        self.first_attack_bonus = 3
+        self.max_hp += 2
+        self.hp += 2
+        self.atk += 1
+        self.action = self._alpha_action
+        print(f"$ {self} became an Alpha {self}")
 
 
 class Squirrel(Animal):
@@ -172,6 +272,16 @@ class Squirrel(Animal):
         self, hp: int = 1, atk: int = 1, spd: int = 2, friendliness: int = 5, is_wild: bool = True
     ):
         Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Squirrel")
+        self.action = self._action
+
+    def _action(self, target: Animal):
+        if target.can_be_attacked():
+            scroll(f"! {self} attacked {target}")
+            target.take_dmg(self, self.atk)
+
+    def _become_alpha(self):
+        # TODO: Implement
+        pass
 
 
 class Snake(Animal):
@@ -179,15 +289,13 @@ class Snake(Animal):
         self, hp: int = 1, atk: int = 1, spd: int = 2, friendliness: int = 3, is_wild: bool = True
     ):
         Animal.__init__(self, hp, atk, spd, friendliness, is_wild=is_wild, name="Snake")
+        self.action = self._action
 
-    def execute_action(self):
-        # Can't execute action if already dead
-        if self.is_dead():
-            return
+    def _action(self, target: Animal):
+        if target.can_be_attacked():
+            scroll(f"! {self} attacked and poisoned {target}")
+            target.take_dmg(self, self.atk, poison=True)
 
-        if self.action_target.can_be_attacked():
-            scroll(f"! {self} attacked and poisoned {self.action_target}")
-            self.action_target.take_dmg(self, self.atk, poison=True)
-
-        # Reset stored action target
-        self.action_target = None
+    def _become_alpha(self):
+        # TODO: Implement
+        pass
